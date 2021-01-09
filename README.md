@@ -1,2 +1,4 @@
 # gnoraster
-foo
+
+bar
+
