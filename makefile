@@ -41,7 +41,7 @@ endif
 
 SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
 
-OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 rm       = rm -f
 
 

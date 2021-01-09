@@ -19,8 +19,42 @@ void abort_(const char * s, ...);
 
 #define PI 3.14159265358979323846
 
-//the "pixel" objects (struct) to fill "framebuffer" objects (grids of these) 
 
+
+class color {
+    public:
+        color(){
+        };
+
+        ~color(){};
+
+};
+
+/***************************************/
+
+
+class rgb : public color 
+{ 
+    public: 
+        rgb(){
+        };
+
+        ~rgb(){};
+
+    
+    ////// void hello(void); //test of inheritance 
+    ////// int getnum_verts(void);
+    ////// Vector3 centroid(Vector3 p1, Vector3 p2, Vector3 p3);
+    ////// void centroid(Vector3 *out, Vector3 p1, Vector3 p2, Vector3 p3);
+    ////// Vector3 triangle_pt_vec3(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 dpt);
+    ////// double triangle_mean_z(Vector3 p1, Vector3 p2, Vector3 p3);
+    ////// Vector3 three_vec3_to_normal( Vector3 v1, Vector3 v2, Vector3 v3, bool unitlen);
+
+
+}; 
+
+
+/*
 //24 bit color 
 typedef struct{
     int r=0;
@@ -104,6 +138,8 @@ void draw_vector ( RGBAType *fb_image, int imagewidth, vector2d vec, int xpos, i
 //void draw_square_pt( png_bytep *row_pt, int center[2], int size, int color[3]);
 //void draw_circle ( png_bytep *row_pt, int x_orig, int y_orig, int dia, int color[3]);
 //void draw_fill_circle (  png_bytep *row_pt, int x_orig, int y_orig, int dia, int color[3]);
+
+*/
 
 
 #endif

@@ -4,6 +4,7 @@
 #define DEG_TO_RAD 0.0174532925
 #define RAD_TO_DEG 57.29577951
 
+/*
 //coordinate to a pixel in the scancache 
 struct pix_coord {
     int x;
@@ -56,6 +57,7 @@ vector2d mult_vec_scalar( vector2d input, float amount );
 vector2d line2vect(int start_x, int start_y, int end_x, int end_y);
 vector2d line2vect(float start_x, float start_y, float end_x, float end_y);
 vector2d vmul_2d ( vector2d v1, vector2d v2 );
+*/
 
 
 #endif

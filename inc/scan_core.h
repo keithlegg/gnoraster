@@ -1,8 +1,8 @@
 #ifndef SCANCORE_H    
 #define SCANCORE_H
 
-
-/* use these to optimize speed/memory usage */ 
+/*
+// use these to optimize speed/memory usage 
 #define cachesize 10000               // coresponds to image X/Y res - we should never have an image 10K square.... hopefully
 #define confidence_checksize 200      // If we've found more than 200 fiducial candidates something is wrong. 
 #define anchor_checksize 200          // number of potential hits before it stops looking  
@@ -12,7 +12,7 @@
 #define disable_ringsverif false       // turn off rings verification stage for debugging 
 #define disable_angleverif false       // turn off angle verification stage for debugging 
 
-/* text output debugging */
+// text output debugging 
 #define debug_pointcache false        // dump the cached points    
 #define debug_verify false            // info verify 
 #define debug_verify_rings false      // info verify axis aligned
@@ -53,7 +53,7 @@ int verify_old(RGBAType *pt_fbInput, RGBAType *pt_fbDiag, int width, int height,
                float verif_dist, int midpoint, int y, int scan_coarse);
 
 int fiducial_compare(const fiducial *f1, const fiducial *f2);
-
+*/
 
 
 #endif
