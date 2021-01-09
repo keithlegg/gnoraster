@@ -32,12 +32,14 @@ endif
 
 # OSX
 ifeq ($(UNAME), Darwin)
-	LFLAGS   = -Wall -lm -lz -I/usr/X11/lib -lpng16
+	# LFLAGS   = -Wall -lm -lz -I/usr/X11/lib -lpng16
+	LFLAGS   = -Wall -lm -lz -I/usr/X11/lib 
+
 endif
 
 
 
-SOURCES  := $(wildcard $(SRCDIR)/*.c)
+SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
 
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 rm       = rm -f
@@ -47,7 +49,7 @@ $(TARGET): $(OBJECTS)
 	@$(LINKER) $(OBJECTS) $(LFLAGS) -o $@
 	@echo "Linking complete!"
 
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully!"
 
