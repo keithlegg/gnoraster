@@ -75,12 +75,13 @@ void test_image_draw( int width, int height, char *outfile)
 /***********************************/
 
 
-void test_sceneloader()
+void test_sceneloader(char* filename)
 {
 
 
-    //RS.load_file( filenam );
-    //RS.show();
+    sceneloader RS;
+    //char* filename = "eee";
+    RS.read_file( filename );
 
     //test_image_draw( atoi(argv[1]), atoi(argv[2]), argv[3], argv[4]);
 
@@ -96,11 +97,8 @@ int main(int argc, char *argv[])
 	//test_load_save_bmp
     //test_image_draw(512, 512, "abc.bmp");
     // std::cout << "Hello World!";
+    test_sceneloader( argv[1] ); //atoi(argv[1])
 
-    sceneloader RS;
-    char* filename = "eee";
-    
-    RS.load_file("Eee");
 
 
 

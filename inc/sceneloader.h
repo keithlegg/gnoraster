@@ -26,10 +26,12 @@ class sceneloader
         char object_path[100];
         
         void show( void );
-        void load_file( char* filepath );
-        // Vector3 campos; 
+        void read_file( char* filepath );
         
-        float lightintensity;
+        void write_file( char* filepath );
+
+        // Vector3 campos; 
+        // float lightintensity;
         // Matrix4 camera_matrix;
 
         //----------------------
