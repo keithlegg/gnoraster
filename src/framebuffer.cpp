@@ -1,808 +1,563 @@
 
+#include <iostream>
+#include <fstream>
+#include <cstring> //memset 
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <cmath> //C++ library 
+#include <cstdlib>
+#include <cmath>
 
-#include "../inc/framebuffer.h"   
-#include "../inc/point_op.h"  
-
-#include <string.h> //for memcopy
+#include "framebuffer.h"
+#include "BMP.h"
 
 
-//R-G-B Clamp dark value - used in determining what the 8 bit cutoff is for "dark"
-short clampRGB = 112; 
+using namespace std; 
+
+
 
 /*
-void abort_(const char * s, ...)
+    BMP bmp9("t1_24.bmp");
+    bmp9.fill_region(0, 0, 50, 50, 0, 0, 255, 255);
+    bmp9.fill_region(150, 0, 100, 150, 0, 255, 0, 255);
+    bmp9.write("t1_24_copy.bmp");
+
+   
+    BMP bmp10("t2_24.bmp");
+    bmp10.fill_region(0, 0, 50, 50, 0, 0, 255, 255);
+    bmp10.fill_region(150, 0, 100, 150, 0, 255, 0, 255);
+    bmp10.write("t2_24_copy.bmp");
+
+    BMP bmp5("Shapes_24.bmp");
+    bmp5.fill_region(0, 0, 100, 200, 0, 0, 255, 255);
+    bmp5.fill_region(150, 0, 209, 203, 0, 255, 0, 255);
+    bmp5.write("Shapes_24_copy.bmp");
+
+    // Read an image from disk and write it back:
+    BMP bmp("Shapes.bmp");
+    bmp.fill_region(0, 0, 100, 200, 0, 0, 255, 255);
+    bmp.write("Shapes_copy.bmp");
+
+    // Create a BMP image in memory, modify it, save it on disk
+    BMP bmp2(800, 600);
+    bmp2.fill_region(50, 20, 100, 200, 0, 0, 255, 255);
+    bmp2.write("img_test.bmp");
+
+    // Create a 24 bits/pixel BMP image in memory, modify it, save it on disk
+    BMP bmp3(200, 200, false);
+    bmp3.fill_region(50, 20, 100, 100, 255, 0, 255, 255);
+    bmp3.write("img_test_24bits.bmp");
+
+    BMP bmp4("img_test_24bits.bmp");
+    bmp4.write("img_test_24bits_2.bmp");
+
+    BMP bmp6(403, 305, false);
+    bmp6.fill_region(0, 0, 50, 50, 0, 0, 255, 0);
+    bmp6.write("test6.bmp");
+
+    BMP bmp7("test6.bmp");
+    bmp7.fill_region(0, 0, 40, 40, 255, 0, 0, 0);
+    bmp7.write("test6_2.bmp");
+
+    BMP bmp8(200, 200, false);
+    bmp8.fill_region(0, 0, 100, 100, 255, 0, 255, 255);
+    bmp8.write("img_test_24bits_3.bmp");
+
+    BMP bmp11("test_pnet.bmp");
+    bmp11.fill_region(0, 0, 100, 100, 255, 0, 255, 255);
+    bmp11.write("test_pnet_copy.bmp");
+
+*/
+
+
+void test_BMP(void)
 {
-    va_list args;
-    va_start(args, s);
-    vfprintf(stderr, s, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-    abort();
+    BMP bmpxx(512, 512);
+    bmpxx.fill_region(0, 0, 50, 50, 0, 0, 255, 255);
+    bmpxx.write("foobartest.bmp");
 }
 
+//     void set_pixel(uint32_t x0, uint32_t y0, uint8_t B, uint8_t G, uint8_t R, uint8_t A) {
+//         if (x0 > (uint32_t)bmp_info_header.width || y0 > (uint32_t)bmp_info_header.height) {
 
-//  this allocates memory for a 2D (linear array indexed by " (Y*width)+X " 
-//  BWI - Black White image - 1 bit  
+
+/********************************************/
+
+/*
+ //RGB color struct
+ struct pixelrgb {
+     double r;
+     double g;
+     double b;
+ };
+*/
+
+   
+/*
+
+//        unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0 ,0,0,0,0 , 54,0,0,0};
+
+0h  2   42 4D   "BM"  ID field (42h, 4Dh)
+2h  4   46 00 00 00   70 Bytes  Size of the BMP file
+6h  2   00 00   Unused  Application specific
+8h  2   00 00   Unused  Application specific
+Ah  4   36 00 00 00   54 bytes  Offset where the pixel array (bitmap data) can be found  DIB Header
+
+//        unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,24,0};
+
+Eh  4   28 00 00 00   40 bytes  Number of bytes in the DIB header (from this point)
+12h   4   02 00 00 00   2 pixels (left to right order)  Width of the bitmap in pixels
+16h   4   02 00 00 00   2 pixels (bottom to top order)  Height of the bitmap in pixels. Positive for bottom to top pixel order. Negative for top to bottom pixel order.
+1Ah   2   01 00   1 plane   Number of color planes being used
+1Ch   2   18 00   24 bits   Number of bits per pixel
+1Eh   4   00 00 00 00   0   BI_RGB, no pixel array compression used
+22h   4   10 00 00 00   16 bytes  Size of the raw data in the pixel array (including padding)
+26h   4   13 0B 00 00   2,835 pixels/meter  Horizontal resolution of the image
+2Ah   4   13 0B 00 00   2,835 pixels/meter  Vertical resolution of the image
+2Eh   4   00 00 00 00   0 colors  Number of colors in the palette
+32h   4   00 00 00 00   0 important colors  0 means all colors are important Start of pixel array (bitmap data)
+
+//
+
+36h   3   00 00 FF  0 0 255   Red, Pixel (0,1)
+39h   3   FF FF FF  255 255 255   White, Pixel (1,1)
+3Ch   2   00 00   0 0   Padding for 4 byte alignment (could be a value other than zero)
+3Eh   3   FF 00 00  255 0 0   Blue, Pixel (0,0)
+41h   3   00 FF 00  0 255 0   Green, Pixel (1,0)
+44h   2   00 00   0 0   Padding for 4 byte alignment (could be a value other than zero)
+
+*/
+
+/********************************************/
+
+
  
-BWI_Type* createBuffer1(int w, int h){
-    BWI_Type *pxl;
-    pxl =  ( BWI_Type *) malloc( (w*h) * sizeof( BWI_Type)  );
-    return pxl; 
+framebuffer::~framebuffer(void) {
+   delete rgbdata;  
 }
 
+framebuffer::framebuffer( int w, int h) {
+       bwidth = w;
+       bheight = h;
+       n = bwidth * bheight;
+       rgbdata = new RGBType[n];
 
-//   this allocates memory for a 2D (linear array indexed by " (Y*width)+X " 
-//    GSI = Gray Scale Image - 8 bit  
-GSI_Type* createBuffer8(int w, int h){
-    GSI_Type *pxl;
-    pxl =  ( GSI_Type *) malloc( (w*h) * sizeof( GSI_Type)  );
-    return pxl; 
+       // degree = radian * (180 / PI) // PI = 3.14159265
+       // radian = degree * (PI/180) 
+       DEG_TO_RAD = 0.0174532925;
+       RAD_TO_DEG = 57.29577951;
+
+       center_x = w/2;
+       center_y = h/2;
+
+       plotcolor.r = 1;
+       plotcolor.g = 1;
+       plotcolor.b = 1;
 }
 
+ 
 
-//  this allocates memory for a 2D (linear array indexed by " (Y*width)+X " 
-//    RGBA = Red Green Blue Alpha - 32 bit  
-RGBAType* createBuffer32(int w, int h){
-    RGBAType *pxl;
-    pxl =  ( RGBAType *) malloc( (w*h) * sizeof( RGBAType)  );
-    return pxl; 
-}
-
-
-//  this allocates memory for a 2D (linear array indexed by " (Y*width)+X " 
-//    RGB = Red Green Blue - 24 bit 
-RGBType* createBuffer24(int w, int h){
-    RGBType *pxl;
-    pxl =  ( RGBType *) malloc( (w*h) * sizeof( RGBType)  );
-    return pxl; 
-}
-
-
-RGBType newRgb(int r, int g, int b){
-    RGBType color;
-
-    color.r = r;
-    color.g = g;
-    color.b = b;
-
-    return color;
-}
-
-RGBAType newRgba(int r, int g, int b, int a){
-    RGBAType color;
-
-    color.r = r;
-    color.g = g;
-    color.b = b;
-    color.a = a;
-
-    return color;
-}
-
-
-RGBType* copyBuffer24( RGBAType *pixels, int w, int h )
+void framebuffer::loadbmp (const char *filename, framebuffer::RGBType *data)
 {
 
-   RGBAType *pixItr1 = 0;  
-   RGBType  *pixItr2 = 0;    
+   //http://www.cplusplus.com/doc/tutorial/files/ 
 
-   RGBType *output = createBuffer24(w,h);
+   // output_image[pix_iterator].b = flat_color;
+   //framebuffer::RGBType poly_color; 
+   //framebuffer::RGBType vtx_color; 
+ 
+   streampos size;
+   char * memblock;
 
-   for (int y = 0; y < h; y++)
-   {     
-       for (int x = 0; x < w; x++)
-       {  
-           pixItr1 = &( pixels  [(y*w)+x] );
-           pixItr2 = &( output  [(y*w)+x] );
-
-           pixItr2->r = pixItr1->r;       
-           pixItr2->g = pixItr1->g;  
-           pixItr2->b = pixItr1->b;  
-       }
-   }
-  return output;
-
-}
-
-
-RGBType* copyBuffer24( RGBType *pixels, int w, int h )
-{
-
-   RGBType *pixItr1 = 0;  
-   RGBType *pixItr2 = 0;    
-
-   RGBType *output = createBuffer24(w,h);
-
-   for (int y = 0; y < h; y++)
-   {     
-       for (int x = 0; x < w; x++)
-       {  
-           pixItr1 = &( pixels  [(y*w) + x] );
-           pixItr2 = &( output  [(y*w) + x] );
-
-           pixItr2->r = pixItr1->r;       
-           pixItr2->g = pixItr1->g;  
-           pixItr2->b = pixItr1->b;  
-
-       }
-   }
-  return output;
-
-}
-
-
-RGBAType* copyBuffer32( RGBAType *pixels, int w, int h )
-{
-
-   RGBAType  *pixItr1 = 0;  
-   RGBAType *pixItr2 = 0;    
-
-   RGBAType *output = createBuffer32(w,h);
-
-   for (int y = 0; y < h; y++)
-   {     
-       for (int x = 0; x < w; x++)
-       {  
-           pixItr1 = &( pixels  [(y*w)+x] );
-           pixItr2 = &( output  [(y*w)+x] );
-
-           pixItr2->r = pixItr1->r;       
-           pixItr2->g = pixItr1->g;  
-           pixItr2->b = pixItr1->b;  
-           pixItr2->a = pixItr1->a;  
-
-       }
-   }
-  return output;
-
-}
-
-RGBAType* copyBuffer32( RGBType *pixels, int w, int h )
-{
-
-   RGBType *pixItr1 = 0;  
-   RGBAType *pixItr2 = 0;    
-
-   RGBAType *output = createBuffer32(w,h);
-
-   for (int y = 0; y < h; y++)
-   {     
-       for (int x = 0; x < w; x++)
-       {  
-           pixItr1 = &( pixels  [(y*w) + x] );
-           pixItr2 = &( output  [(y*w) + x] );
-
-           pixItr2->r = pixItr1->r;       
-           pixItr2->g = pixItr1->g;  
-           pixItr2->b = pixItr1->b;  
-           pixItr2->a = 255; 
-       }
-   }
-  return output;
-
-}
-
-
-RGBAType* blitBuffer32( RGBAType *pixels, int* w, int* h, int startx, int starty,  
-                        int endx, int endy )
-{
-
-   RGBAType *pixItr1 = 0;  
-   RGBAType *pixItr2 = 0;    
-
-   int new_w = (endx-startx);
-   int new_h = (endy-starty);
-
-   RGBAType *output = createBuffer32( new_w, new_h );
-
-   int cnt_x = 0;
-   int cnt_y = 0;
-
-   for (int y = starty; y < endy; y++)
-   {     
-       cnt_x = 0;
-       for (int x = startx; x < endx; x++)
-       {  
-           pixItr1 = &( pixels [(y* *w) + x] );
-           pixItr2 = &( output [(cnt_y* new_w) + cnt_x] );
-           
-           pixItr2->r = pixItr1->r;       
-           pixItr2->g = pixItr1->g;  
-           pixItr2->b = pixItr1->b;  
-           pixItr2->a = pixItr1->a; 
-           
-           cnt_x++;
-       }
-       cnt_y++;
+   ifstream file (filename, ios::in|ios::binary|ios::ate);
+  
+   if (file.is_open())
+   {
+       size = file.tellg();
+       memblock = new char [size];
+       file.seekg (0, ios::beg);
+       file.read (memblock, size);
+       file.close();
+   
+       cout << "the entire file content is in memory" << endl; 
+       delete[] memblock;
    }
 
-   *h = new_h;
-   *w = new_w;
-
-  return output;
-}
- 
-//  basically used to half the resolution of an image- this is a not very great way of scaling an image
-//  only can scale an image by a square resolution and a factor of two (1=half, 2=quarter, etc)
-RGBAType* copyBufferEveryOther32( RGBAType *pixels, int* w, int* h, float step_size )
-{
-    RGBAType *pixItr1 = 0;  
-    RGBAType *pixItr2 = 0;    
- 
-    int new_w = (int)*w / step_size;
-    int new_h = (int)*h / step_size;
-    RGBAType *output = createBuffer32(new_w, new_h);
- 
-    int cnt_x = 0;
-    int cnt_y = 0;
-    float oldx, oldy = 0;
-    
-    int size_width  = *w;
-    int size_height = *h;
-    int i, count, xpos, ypos = 0;
-    
-    int x,y = 0;
-    
-    // #pragma omp parallel for // ???
-    count = 0;
-    for (y = 0; y < new_h; y++)
-    {    
-        xpos = 0;
-        ypos = (int) rint(y * step_size); 
-        for (x = 0; x < new_w; x++)
-        {  
-            xpos = (int) rint(x * step_size);
-            pixItr1 = &(pixels[((unsigned long)((ypos * *w) + xpos))]);
-            pixItr2 = &(output[count]);
-         
-            pixItr2->r = pixItr1->r;       
-            pixItr2->g = pixItr1->g;  
-            pixItr2->b = pixItr1->b;  
-            pixItr2->a = pixItr1->a;  
-            
-            count++;
-        }
-    }
-    
-    *w = (int)(new_w);
-    *h = (int)(new_h);
- 
-    return output;
+   else cout << "Unable to open file";
+   //return 0;
 
 }
-
-//got this from here:
-//http://www.compuphase.com/graphic/scale.htm
-
-void ScaleLine(RGBAType *Target, RGBAType *Source, int SrcWidth, int TgtWidth)
-{
-  int NumPixels = TgtWidth;
-  int stepPart   = SrcWidth / TgtWidth;
-  int FractPart = SrcWidth % TgtWidth;
-  int E = 0;
-
-  while (NumPixels-- > 0) {
-    
-    *Target++ = *Source;
-    Source += stepPart;
-
       
-    E += FractPart;
-    if (E >= TgtWidth) {
-      E -= TgtWidth;
-      Source++;
-    } 
-     
-  }  
-}
 
 
-void ScaleRect(RGBAType *Target, RGBAType *Source, int SrcWidth, int SrcHeight,
-               int TgtWidth, int TgtHeight)
-{
-  int NumPixels = TgtHeight;
-  int stepHeight   = (SrcHeight / TgtHeight) * SrcWidth;
-  int FractPart = SrcHeight % TgtHeight;
-  int E = 0;
-  RGBAType *PrevSource = NULL;
+/********************************************/
+/*
+void framebuffer::savebmp (const char *filename, int w, int h, int dpi, framebuffer::RGBType *data) {
+    FILE *f;
+    unsigned char *img = NULL;
+    int filesize = 54 + 3*w*h;  //w is your image width, h is image height, both int
 
-  while (NumPixels-- > 0) {
-    if (Source == PrevSource) {
-      memcpy(Target, Target-TgtWidth, TgtWidth*sizeof(*Target));
-    } else {
-      ScaleLine(Target, Source, SrcWidth, TgtWidth);
-      PrevSource = Source;
-    }//if 
-    
-    Target += TgtWidth;
-    Source += stepHeight;
-     
-    E += FractPart;
-    if (E >= TgtHeight) {
-      E -= TgtHeight;
-      Source += SrcWidth;
-    }//if
-    
-  }//while
-}
+    img = (unsigned char *)malloc(3*w*h);
+    std::memset(img,0,3*w*h);
 
+    int x,y = 0;
+    double r,g,b = 0;
 
-// fill RGB buffer with a solid color - from RGBType
-void fillbuffer24(RGBType *pixBuffer, int width, int height, RGBType *color)
-{
-    int xa = 0;
-    int ya = 0;
-
-    RGBType* pixItr = 0;
-
-    for (ya=0;ya<height;ya++)
+    for(int i=0; i<w; i++)
     {
-        for (xa=0;xa<width;xa++)
+        for(int j=0; j<h; j++)
         {
-            pixItr = &( pixBuffer  [(ya*width) + xa] );
+            x=i; y=(h-1)-j;
             
-            pixItr->r = color->r;
-            pixItr->g = color->g;
-            pixItr->b = color->b;
+            r  = (data[(h*y+x)].b)*255;
+            g  = (data[(h*y+x)].g)*255;
+            b  = (data[(h*y+x)].r)*255;
 
+            if (r > 255) r=255;
+            if (g > 255) g=255;
+            if (b > 255) b=255;
+            img[(x+y*w)*3+2] = (unsigned char)(r);
+            img[(x+y*w)*3+1] = (unsigned char)(g);
+            img[(x+y*w)*3+0] = (unsigned char)(b);
         }
     }
 
+    unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
+    unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
+    unsigned char bmppad[3] = {0,0,0};
 
-}
+    bmpfileheader[ 2] = (unsigned char)(filesize    );
+    bmpfileheader[ 3] = (unsigned char)(filesize>> 8);
+    bmpfileheader[ 4] = (unsigned char)(filesize>>16);
+    bmpfileheader[ 5] = (unsigned char)(filesize>>24);
 
+    bmpinfoheader[ 4] = (unsigned char)(       w    );
+    bmpinfoheader[ 5] = (unsigned char)(       w>> 8);
+    bmpinfoheader[ 6] = (unsigned char)(       w>>16);
+    bmpinfoheader[ 7] = (unsigned char)(       w>>24);
+    bmpinfoheader[ 8] = (unsigned char)(       h    );
+    bmpinfoheader[ 9] = (unsigned char)(       h>> 8);
+    bmpinfoheader[10] = (unsigned char)(       h>>16);
+    bmpinfoheader[11] = (unsigned char)(       h>>24);
 
-void fillbuffer32(RGBAType *pixBuffer, int width, int height, RGBType *color)
-{
-    int xa = 0;
-    int ya = 0;
-
-    RGBAType* pixItr = 0;
-
-    for (ya=0;ya<height;ya++)
-    {
-        for (xa=0;xa<width;xa++)
-        {
-            pixItr = &( pixBuffer  [(ya*width) + xa] );
-            
-            pixItr->r = color->r;
-            pixItr->g = color->g;
-            pixItr->b = color->b;
-            pixItr->a = 255;
-
-        }
-    }
-
-
-}
-
-// fill RGB buffer with a solid color - from 3 integers 
-void fillbuffer24(RGBType *pixBuffer, int width, int height, int rval, int gval, int bval)
-{
-    int xa = 0;
-    int ya = 0;
-
-    RGBType* pixItr = 0;
-
-    for (ya=0;ya<height;ya++)
-    {
-        for (xa=0;xa<width;xa++)
-        {
-            pixItr = &( pixBuffer  [(ya*width) + xa] );
-            pixItr->r = rval;
-            pixItr->r = gval;
-            pixItr->r = bval;
-
-        }
-    }
-}
-
-
-// clamping functions to determine a "dark" pixel 
-short scanner_darkly(RGBAType* pixel32){
-   if (pixel32->r <clampRGB || pixel32->g <clampRGB || pixel32->b <clampRGB ){
-     return 1;
-   }
-   return 0;
-}
-
-short scanner_darkly(RGBType* pixel24){
-   if (pixel24->r <clampRGB || pixel24->g <clampRGB || pixel24->b <clampRGB ){
-     return 1;
-   }
-   return 0;
-}
-
-short scanner_darkly(int *pix){
-   if (pix[0]<clampRGB || pix[1]<clampRGB || pix[2]<clampRGB ){
-     return 1;
-   }
-   return 0;
-}
-
-
-
-void draw_point ( RGBAType *fb_image, int imagewidth, int pt[2], int color[3]  ){
-    RGBAType* ptr = &(fb_image[(pt[1]*imagewidth)+pt[0]]);
-    ptr->r= color[0];ptr->g=color[1];ptr->b=color[2];
-}
-
-void draw_point ( RGBAType *fb_image, int imagewidth, int xcoord, int ycoord, int color[3]  ){
-    RGBAType* ptr = &(fb_image[(ycoord*imagewidth)+xcoord]);
-    ptr->r= color[0];ptr->g=color[1];ptr->b=color[2];
-}
-
-void draw_point ( RGBAType *fb_image, int imagewidth, int xcoord, int ycoord, RGBType *color  ){
-    RGBAType* ptr = &(fb_image[(ycoord*imagewidth)+xcoord]);
-    ptr->r= color->r;ptr->g=color->g;ptr->b=color->b;ptr->a=255;
-}
-
-void draw_point ( RGBType *fb_image, int imagewidth, int xcoord, int ycoord, int color[3]  ){
-    RGBType* ptr = &(fb_image[(ycoord*imagewidth)+xcoord]);
-    ptr->r= color[0];ptr->g=color[1];ptr->b=color[2];
-}
-
-void draw_point ( RGBType *fb_image, int imagewidth, int xcoord, int ycoord, RGBType *color  ){
-    RGBType* ptr = &(fb_image[(ycoord*imagewidth)+xcoord]);
-    ptr->r= color->r;ptr->g=color->g;ptr->b=color->b;
-}
-
-// UNTESTED - add point width (need imageheight to do it right)
-void draw_point ( RGBType *fb_image, int imagewidth, int xcoord, int ycoord, int dia, RGBType *color  ){
-    for (int i=0;i<dia;i++)
-    {
-        if (xcoord+i<imagewidth){
-            RGBType* ptr = &(fb_image[(ycoord*imagewidth)+(xcoord+i)]);
-            ptr->r= color->r;ptr->g=color->g;ptr->b=color->b;
-        }
-
-        if (xcoord-i>0){
-            RGBType* ptr = &(fb_image[(ycoord*imagewidth)+(xcoord-i)]);
-            ptr->r= color->r;ptr->g=color->g;ptr->b=color->b;
-        }
-        
-        if (ycoord-1>0){
-            RGBType* ptr = &(fb_image[((ycoord-i)*imagewidth)+xcoord]);
-            ptr->r= color->r;ptr->g=color->g;ptr->b=color->b;
-        }
-
-    }
-}
-
-
-void threshold (RGBAType *pixbuffer, int imagewidth, int imageheight, int threshval) 
-// 32 bit threshold
-{
-    RGBAType* pix = 0;
-
-    for(int i=0; i<imageheight; i++)
-    {
-        for(int j=0; j<imagewidth; j++) 
-        {
-            pix = &( pixbuffer [(i*imagewidth)+j]);
-            
-            //thresholded output
-            if (pix->r<threshval || pix->g<threshval || pix->b<threshval )
-            {
-                  pix->r =  0;
-                  pix->g =  0;
-                  pix->b =  0;
-                  pix->a =  255;   
-            }else{
-                  pix->r =  255;
-                  pix->g =  255;
-                  pix->b =  255;
-                  pix->a =  255;  
-            }
-        }//imagewidth
-     }//imageheight
-}
-
-
-void threshold (RGBType *pixbuffer, int imagewidth, int imageheight, int threshval) 
-//   24 bit threshold
-{
-    RGBType* pix = 0;
-
-    for(int i=0; i<imageheight; i++)
-    {
-        for(int j=0; j<imagewidth; j++) 
-        {
-            pix = &( pixbuffer [(i*imagewidth)+j]);
-            
-            //thresholded output
-            if (pix->r<threshval || pix->g<threshval || pix->b<threshval )
-            {
-                  pix->r =  0;
-                  pix->g =  0;
-                  pix->b =  0;
-            }else{
-                  pix->r =  255;
-                  pix->g =  255;
-                  pix->b =  255;
-            }
-        }//imagewidth
-     }//imageheight
-}
-
-
-// guassian blur funciton with optional threshold 
-void gaussBlur (RGBAType *pixbuffer, RGBAType *pix2buffer, int imagewidth, int imageheight, int r, bool do_threshold, int threshval) 
-{
-    int w = imagewidth;
-    int h = imageheight;
-
-    RGBAType* im1_pix = 0;
-    RGBAType* im2_pix = 0;
-
-    int rs = (int)ceil(r * .5); //significant radius
+    f = fopen(filename,"wb");
+    fwrite(bmpfileheader,1,14,f);
+    fwrite(bmpinfoheader,1,40,f);
     for(int i=0; i<h; i++)
     {
-
-        for(int j=0; j<w; j++) 
-        {
-
-            int rval = 0;
-            int gval = 0;
-            int bval = 0; 
-            int x = 0;
-            int y = 0;
-
-            int wsum = 0; 
-
-            //fake "convolution kernel" iterate around the pixel at radius R 
-            for(int iy = i-rs; iy<(i+rs+1); iy++)
-            {
-                for(int ix = j-rs; ix<(j+rs+1); ix++) 
-                {
-                    x = min(w-1, max(0, ix)); //clamp the extents/corner x
-                    y = min(h-1, max(0, iy)); //clamp the extents/corner y
-
-                    //long dsq = (ix-j)*(ix-j)+(iy-i)*(iy-i);
-                    //int wght = exp( -dsq / (2*r*r) ) / (int)(PI*2*r*r);
-                    
-                    int wght = 1; //full weighted average
-                    
-                    wsum += wght;
-  
-                    im1_pix = &( pixbuffer [(y*imagewidth) + x]);
-                    rval += im1_pix->r;
-                    gval += im1_pix->g;
-                    bval += im1_pix->b; 
-                    //dont care about alpha - set to 255 
-
-                }//kernel X
-           }//kernel Y
-
-           im2_pix = &( pix2buffer [(i*imagewidth) + j] );
-
-           //paste the color to the output framebuffer
-           if (!do_threshold){
-
-               //printf( "rval %i gval %i bval%i \n", (rval/wsum), (gval/wsum), (bval/wsum) ) ;
-
-               im2_pix->r = (int)(rval/wsum);
-               im2_pix->g = (int)(gval/wsum);
-               im2_pix->b = (int)(bval/wsum);
-               im2_pix->a = 255;
-           
-           }
-
-           if (do_threshold){
-               //thresholded output
-               if ((int)(rval/wsum)<threshval || (int)(gval/wsum)<threshval || (int)(bval/wsum)<threshval )
-               {
-                  im2_pix->r =  0;
-                  im2_pix->g =  0;
-                  im2_pix->b =  0;
-                  im2_pix->a =  255;   
-               }else{
-                  im2_pix->r =  255;
-                  im2_pix->g =  255;
-                  im2_pix->b =  255;
-                  im2_pix->a =  255;  
-               }
-           }
-        }//width
-     }//height
-}
-
-
-void draw_square( RGBAType *row_pt, int width, int tl[2], int br[2], int color[3] )
-{
-  int plot_x = 0;
-  int plot_y = 0;
-  int px     = 0;
-
-  int tl_x = tl[0];
-  int tl_y = tl[1];
-  int br_x = br[0];
-  int br_y = br[1];
-  
-  for ( px =tl_x; px <br_x; px++){ draw_point(row_pt, width, px, br_y, color); }
-  for ( px =tl_x; px <br_x; px++){ draw_point(row_pt, width, px, tl_y, color); }
-  for ( px =tl_y; px <=br_y; px++){ draw_point(row_pt, width, br_x, px, color); }
-  for ( px =tl_y; px <=br_y; px++){ draw_point(row_pt, width, tl_x, px, color); }
-}
-
-
-void draw_fill_square( RGBAType *row_pt, int width, int x_orig, int y_orig, int dia, int color[3])
-{
-   int tl[2] = {0};
-   int br[2] = {0};
-
-   for (int a=0;a<dia;a++){
-
-       tl[0] = x_orig-a;
-       tl[1] = y_orig-a;
-       
-       br[0] = x_orig+a;
-       br[1] = y_orig+a;
-
-       draw_square( row_pt, width, tl, br, color );
-
-   }
-
-}
-
-
-// //draw a square at a center point  
-// void draw_square_pt(  png_bytep *row_pt, int center[2], int size, int color[3])
-// {
-//    int tl[2];
-//    int br[2];
-//    tl[0] = center[0]-size;
-//    tl[1] = center[1]-size;
-//    br[0] = center[0]+size;
-//    br[1] = center[1]+size;
-//    draw_square(row_pt, tl, br, color);
-// }
-// void draw_fill_circle ( png_bytep *row_pt, int x_orig, int y_orig, int dia, int color[3])
-// {
-//   int plot_x = 0;
-//   int plot_y = 0;
-//   for (int id = 0; id <=dia; id++)
-//   {  
-//     for (int i = 0; i <=360; i++)
-//     {  
-//         plot_x = x_orig + (sin(deg_to_rad(i))*id) ;
-//         plot_y = y_orig + (cos(deg_to_rad(i))*id) ;
-//         draw_point(row_pt, plot_x, plot_y, color); 
-//     }
-//   }
-// }
-
-
-void draw_line( RGBAType *fb_image, int imagewidth, int x1, int y1, int x2, int y2, RGBType *color) 
-{
-    int delta_x(x2 - x1);
-    // if x1 == x2, then it does not matter what we set here
-    signed char const ix((delta_x > 0) - (delta_x < 0));
-    delta_x = abs(delta_x) << 1;
-         int delta_y(y2 - y1);
-    // if y1 == y2, then it does not matter what we set here
-    signed char const iy((delta_y > 0) - (delta_y < 0));
-    delta_y = abs(delta_y) << 1;
-    draw_point(fb_image, imagewidth, x1, y1, color );
-    
-    if (delta_x >= delta_y)
-    {
-        // error may go below zero
-        int error(delta_y - (delta_x >> 1));
-        while (x1 != x2)
-        {
-            if ((error >= 0) && (error || (ix > 0)))
-            {
-                error -= delta_x;
-                y1 += iy;
-            }
-            // else do nothing
-            error += delta_y;
-            x1 += ix;
-            draw_point(fb_image, imagewidth, x1, y1, color);
-        }
-    }
-    else
-    {
-        // error may go below zero
-        int error(delta_x - (delta_y >> 1));
-        while (y1 != y2)
-        {
-            if ((error >= 0) && (error || (iy > 0)))
-            {
-                error -= delta_y;
-                x1 += ix;
-            }
-            // else do nothing
-            error += delta_x;
-            y1 += iy;
-            draw_point(fb_image, imagewidth, x1, y1, color );
-        }
-    }
-}
-
-
-void draw_line( RGBType *fb_image, int imagewidth, int x1, int y1, int x2, int y2, RGBType *color)  
-{
-    int delta_x(x2 - x1);
-    // if x1 == x2, then it does not matter what we set here
-    signed char const ix((delta_x > 0) - (delta_x < 0));
-    delta_x = abs(delta_x) << 1;
-         int delta_y(y2 - y1);
-    // if y1 == y2, then it does not matter what we set here
-    signed char const iy((delta_y > 0) - (delta_y < 0));
-    delta_y = abs(delta_y) << 1;
-    draw_point(fb_image, imagewidth, x1, y1, color );
-    
-    if (delta_x >= delta_y)
-    {
-        // error may go below zero
-        int error(delta_y - (delta_x >> 1));
-        while (x1 != x2)
-        {
-            if ((error >= 0) && (error || (ix > 0)))
-            {
-                error -= delta_x;
-                y1 += iy;
-            }
-            // else do nothing
-            error += delta_y;
-            x1 += ix;
-            draw_point(fb_image, imagewidth, x1, y1, color);
-        }
-    }
-    else
-    {
-        // error may go below zero
-        int error(delta_x - (delta_y >> 1));
-        while (y1 != y2)
-        {
-            if ((error >= 0) && (error || (iy > 0)))
-            {
-                error -= delta_y;
-                x1 += ix;
-            }
-            // else do nothing
-            error += delta_x;
-            y1 += iy;
-            draw_point(fb_image, imagewidth, x1, y1, color );
-        }
-    }
-}
-
-
-
-// draw a linear, non-periodic poly line from a list of points 
-void draw_poly_line ( RGBAType *fb_image, int imagewidth, pix_coord *vertices, int numpts, RGBType *color )
-{
-    int i =0;
-    if (numpts<2){
-      return;
-    }  
-
-    for (i=1;i<numpts;i++ )
-    {
-        draw_line( fb_image, imagewidth, vertices[i-1].x, vertices[i-1].y, vertices[i].x, vertices[i].y, color );      
+        fwrite(img+(w*(h-i-1)*3),3,w,f);
+        fwrite(bmppad,1,(4-(w*3)%4)%4,f);
     }
 
-}
-
-
-
-// transform a vector to a point and draw it. 
-void draw_vector ( RGBAType *fb_image, int imagewidth, vector2d vec, int xpos, int ypos, RGBType *color )
-{
-    int start_x = xpos;
-    int start_y = ypos;
-    int end_x   = (int)vec.x + ypos;
-    int end_y   = (int)vec.y + ypos;
-
-    draw_line( fb_image, imagewidth, start_x, start_y, end_x, end_y, color );      
+    free(img);
+    fclose(f);
 
 }
 */
+
+
+/********************************************/
+
+/*
+
+// setup header structs bmpfile_header and bmp_dib_v3_header before this (see wiki)
+// * note for a windows bitmap you want a negative height if you're starting from the top *
+// * otherwise the image data is expected to go from bottom to top *
+
+FILE * fp = fopen ("file.bmp", "wb");
+fwrite(bmpfile_header, sizeof(bmpfile_header), 1, fp);
+fwrite(bmp_dib_v3_header, sizeof(bmp_dib_v3_header_t), 1, fp);
+
+for (int i = 0; i < 200; i++)  {
+ for (int j = 0; j < 200; j++) {
+  fwrite(&image[j][i][2], 1, 1, fp);
+  fwrite(&image[j][i][1], 1, 1, fp);
+  fwrite(&image[j][i][0], 1, 1, fp);
+ }
+}
+
+fclose(fp);
+
+*/
+
+/********************************************/
+
+void framebuffer::savebmp (const char *filename, int w, int h, int dpi, framebuffer::RGBType *data) {
+
+    FILE *f;
+    int k = w*h;
+    int s = 4*k;
+    int filesize = 54 +s;
+
+
+    double factor = 39.375;
+    int m = static_cast<int>(factor);
+
+    int ppm = dpi*m;
+    unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0 ,0,0,0,0 , 54,0,0,0};
+    unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,24,0};
+
+    bmpfileheader[2] = (unsigned char) (filesize);
+    bmpfileheader[3] = (unsigned char) (filesize>>8);
+    bmpfileheader[4] = (unsigned char) (filesize>>16);
+    bmpfileheader[5] = (unsigned char) (filesize>>24);
+
+    bmpinfoheader[4] = (unsigned char) (w);
+    bmpinfoheader[5] = (unsigned char) (w>>8);
+    bmpinfoheader[6] = (unsigned char) (w>>16);
+    bmpinfoheader[7] = (unsigned char) (w>>24);
+
+    bmpinfoheader[8]  = (unsigned char) (h);
+    bmpinfoheader[9]  = (unsigned char) (h>>8);
+    bmpinfoheader[10] = (unsigned char) (h>>16);
+    bmpinfoheader[11] = (unsigned char) (h>>24);
+
+    bmpinfoheader[21] = (unsigned char) (s);
+    bmpinfoheader[22] = (unsigned char) (s>>8);
+    bmpinfoheader[23] = (unsigned char) (s>>16);
+    bmpinfoheader[24] = (unsigned char) (s>>24);
+
+    bmpinfoheader[25] = (unsigned char) (ppm);
+    bmpinfoheader[26] = (unsigned char) (ppm>>8);
+    bmpinfoheader[27] = (unsigned char) (ppm>>16);
+    bmpinfoheader[28] = (unsigned char) (ppm>>24);
+
+    bmpinfoheader[29] = (unsigned char) (ppm);
+    bmpinfoheader[30] = (unsigned char) (ppm>>8);
+    bmpinfoheader[31] = (unsigned char) (ppm>>16);
+    bmpinfoheader[32] = (unsigned char) (ppm>>24);
+
+    f = fopen( filename,"wb");
+    fwrite( bmpfileheader, 1, 14, f);
+    fwrite( bmpinfoheader, 1, 40, f);
+
+    for (int i = 0; i < k;i++)
+    {
+        framebuffer::RGBType rgb = data[i];
+
+        double red   = (data[i].b)*255;
+        double green = (data[i].g)*255;
+        double blue  = (data[i].r)*255;
+        
+        //uint8_t red   = (data[i].b)*255;
+        //uint8_t green = (data[i].g)*255;
+        //uint8_t blue  = (data[i].r)*255;
+
+        // -------------------------
+
+        // OSX complains when compiling with -std-c++11 option  
+        // error: non-constant-expression cannot be narrowed from type 'int' to 'unsigned char' in 
+        //unsigned char color[3] = { (int)floor(blue),(int)floor(green),(int)floor(red) };
+        
+        //this is modified to compile on OSX - not sure its right (or the other one, for that matter!)
+        int color[3] = { (int)(blue),(int)(green),(int)(red) };
+        
+        //-------------------------
+
+        fwrite (color, 1,3,f);
+    }
+    fclose(f);
+
+}
+ 
+
+/********************************************/
+
+void framebuffer::draw_point ( int xcoord, int ycoord ){
+   if (xcoord >bwidth){return;}
+   if (ycoord >bheight){return;}
+   
+   if (xcoord > 0 && xcoord > 1){
+       if (xcoord < framebuffer::bwidth && xcoord < framebuffer::bheight){
+           pix_iterator = (ycoord * framebuffer::bwidth) + xcoord;
+           
+           rgbdata[pix_iterator].r = plotcolor.r;       
+           rgbdata[pix_iterator].g = plotcolor.g;
+           rgbdata[pix_iterator].b = plotcolor.b;
+       }
+   }
+}
+
+/********************************************/
+
+void framebuffer::draw_point ( int xcoord, int ycoord, RGBType pcol ){
+   if (xcoord >bwidth){return;}
+   if (ycoord >bheight){return;}
+   
+   if (xcoord > 0 && xcoord > 1){  
+       if (xcoord < framebuffer::bwidth && xcoord < framebuffer::bheight){  
+           pix_iterator = (ycoord * framebuffer::bwidth) + xcoord;    
+           rgbdata[pix_iterator].r = pcol.r;       
+           rgbdata[pix_iterator].g = pcol.g;
+           rgbdata[pix_iterator].b = pcol.b;
+       }
+   }
+}
+
+/********************************************/
+
+void framebuffer::draw_circle ( int x_orig, int y_orig, int dia){
+
+   if (x_orig> bwidth){return;}
+   if (y_orig> bheight){return;}
+
+   int plot_x = 0;
+   int plot_y = 0;
+
+   for (int i = 0; i <=360; i++)
+   {  
+       plot_x = x_orig + (sin(deg_to_rad(i))*dia) ;
+       plot_y = y_orig + (cos(deg_to_rad(i))*dia) ;
+       draw_point(plot_x, plot_y); 
+   }
+}
+
+/********************************************/
+
+void framebuffer::draw_circle ( int x_orig, int y_orig, int dia, RGBType pcol){
+   if (x_orig> bwidth){return;}
+   if (y_orig> bheight){return;}
+
+   int plot_x = 0;
+   int plot_y = 0;
+
+   for (int i = 0; i <=360; i++)
+   {  
+       plot_x = x_orig + (sin(deg_to_rad(i))*dia) ;
+       plot_y = y_orig + (cos(deg_to_rad(i))*dia) ;
+       draw_point(plot_x, plot_y, pcol); 
+   }
+}
+
+/********************************************/
+
+// degree to radian 
+double framebuffer::deg_to_rad ( double deg){
+    return deg * DEG_TO_RAD;
+}
+
+// radian to degree
+double framebuffer::rad_to_deg ( double rad){
+    return rad * RAD_TO_DEG;
+}
+
+/********************************************/
+
+/* 
+   draw_line:
+
+   args:
+       x1 - x coord of line start
+       y1 - y coord of line start 
+       x2 - x coord of line end 
+       y2 - y coord of line end 
+
+   use bresenhams algorithm to dram a line using the default color 
+
+*/
+
+void framebuffer::draw_line(int x1, int y1, int const x2, int const y2)
+{
+   if (x1> bwidth){return;}
+   if (y1> bheight){return;}
+
+    int delta_x(x2 - x1);
+    // if x1 == x2, then it does not matter what we set here
+    signed char const ix((delta_x > 0) - (delta_x < 0));
+    delta_x = std::abs(delta_x) << 1;
+    int delta_y(y2 - y1);
+    // if y1 == y2, then it does not matter what we set here
+    signed char const iy((delta_y > 0) - (delta_y < 0));
+    delta_y = std::abs(delta_y) << 1;
+    draw_point( x1, y1 );
+    if (delta_x >= delta_y)
+    {
+        // error may go below zero
+        int error(delta_y - (delta_x >> 1));
+        while (x1 != x2)
+        {
+            if ((error >= 0) && (error || (ix > 0)))
+            {
+                error -= delta_x;
+                y1 += iy;
+            }
+            // else do nothing
+            error += delta_y;
+            x1 += ix;
+            draw_point(x1, y1);
+        }
+    }
+    else
+    {
+        // error may go below zero
+        int error(delta_x - (delta_y >> 1));
+        while (y1 != y2)
+        {
+            if ((error >= 0) && (error || (iy > 0)))
+            {
+                error -= delta_y;
+                x1 += ix;
+            }
+            // else do nothing
+            error += delta_x;
+            y1 += iy;
+            draw_point(x1, y1 );
+        }
+    }
+}
+
+/********************************************/
+
+void framebuffer::draw_line(int x1, int y1, int const x2, int const y2, RGBType pcol)
+{
+    if (x1> bwidth){return;}
+    if (y1> bheight){return;}
+
+    int delta_x(x2 - x1);
+    // if x1 == x2, then it does not matter what we set here
+    signed char const ix((delta_x > 0) - (delta_x < 0));
+    delta_x = std::abs(delta_x) << 1;
+    int delta_y(y2 - y1);
+    // if y1 == y2, then it does not matter what we set here
+    signed char const iy((delta_y > 0) - (delta_y < 0));
+    delta_y = std::abs(delta_y) << 1;
+    draw_point( x1, y1, pcol );
+    if (delta_x >= delta_y)
+    {
+        // error may go below zero
+        int error(delta_y - (delta_x >> 1));
+        while (x1 != x2)
+        {
+            if ((error >= 0) && (error || (ix > 0)))
+            {
+                error -= delta_x;
+                y1 += iy;
+            }
+            // else do nothing
+            error += delta_y;
+            x1 += ix;
+            draw_point(x1, y1, pcol);
+        }
+    }
+    else
+    {
+        // error may go below zero
+        int error(delta_x - (delta_y >> 1));
+        while (y1 != y2)
+        {
+            if ((error >= 0) && (error || (iy > 0)))
+            {
+                error -= delta_y;
+                x1 += ix;
+            }
+            // else do nothing
+            error += delta_x;
+            y1 += iy;
+            draw_point(x1, y1, pcol);
+        }
+    }
+}
+
+
+
+
 
