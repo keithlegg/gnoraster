@@ -9,6 +9,7 @@
 #include "framebuffer.h"
 #include "sceneloader.h"
 
+using namespace std;
 
 
 int MAX_CHARS_PER_LINE = 100;
@@ -30,12 +31,12 @@ void sceneloader::read_file( char* filepath )
 {
 
 
-    std::cout << "sceneloader loading file "<< filepath << "\n";
+    cout << "sceneloader loading file "<< filepath << "\n";
 
-    std::ifstream fin;
+    ifstream fin;
     fin.open(filepath); // open a file
     if (!fin.good()){ 
-        std::cout << "scene file \""<< filepath <<"\" appears to be missing." << std::endl;
+        cout << "scene file \""<< filepath <<"\" appears to be missing." << endl;
         exit (EXIT_FAILURE); // exit if file not found
     }
 
@@ -63,9 +64,9 @@ void sceneloader::read_file( char* filepath )
 
 
             //----------------------
-            if (!strcmp(token[0],"obj_path"))
+            if (!strcmp(token[0],"loadbmp"))
             {        
-                strcpy( object_path, token[1]);
+                strcpy( bmp_path, token[1]);
             }
 
             //////
@@ -76,23 +77,14 @@ void sceneloader::read_file( char* filepath )
 
     }
 
-    // ################# 
-    // obj_path 3d_obj/monkey.obj
-    // cam_matrix_path camera_matrix.olm
-    // # THIS IS A TEST OF A COMMENT  
-
-    // object_path;
-    // cam_matrix_path;
-    // proj_matrix_path;
-
-}
+}//end write file 
 
 
 
 void sceneloader::show()
 {
 
-   // cout << " 3D object       " << object_path      << "\n";
+   cout << " raster file       " << bmp_path      << "\n";
    // cout << " camera matrix   " << cam_matrix_path  << "\n";
    // cout << " proj matrix     " << proj_matrix_path << "\n";      
 

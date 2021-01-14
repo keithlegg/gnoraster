@@ -1,9 +1,7 @@
 #ifndef SCENELOADER_H    
 #define SCENELOADER_H
 
-
 #include "framebuffer.h"
-//#include "Vectors.h"
 
 
 
@@ -12,7 +10,7 @@ class sceneloader
 
     public: 
         sceneloader(){
-            object_path[0]      = 0; //script_path 
+            bmp_path[0]      = 0; //path to a bmp file  
         };
 
         ~sceneloader(){};
@@ -23,18 +21,54 @@ class sceneloader
         // framebuffer::RGBType line_color; 
         // framebuffer::RGBType fill_color; 
                 
-        char object_path[100];
+        char bmp_path[100];
         
         void show( void );
+
+        /**************************/
+        // file operations 
         void read_file( char* filepath );
-        
         void write_file( char* filepath );
+
+        /**************************/
+        // convert_colors
+
+        // translate 
+        // rotate 
+        // scale 
+        // crop 
+        // blitter
+
+        // apply bit mask 
+        // gaussian blur  
+        // contrast  
+
+        // scan 
+
+        
+        /**************************/         
+        // geom 
+ 
+        // draw line
+
+        // draw triangle 
+        // draw fill_triangle 
+        
+        // draw circle 
+        // draw fill_cirlce 
+    
+        // draw rect
+        // draw fill_rect 
+
+        /**************************/
+
+
 
         // Vector3 campos; 
         // float lightintensity;
         // Matrix4 camera_matrix;
 
-        //----------------------
+
         
 
 

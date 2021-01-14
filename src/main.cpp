@@ -82,6 +82,7 @@ void test_sceneloader(char* filename)
     sceneloader RS;
     //char* filename = "eee";
     RS.read_file( filename );
+    RS.show();
 
     //test_image_draw( atoi(argv[1]), atoi(argv[2]), argv[3], argv[4]);
 

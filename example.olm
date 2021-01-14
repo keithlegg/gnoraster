@@ -1,6 +1,6 @@
 ## test scene  ##
 
-obj_path 3d_obj/teapot.obj #
+loadbmp 3d_obj/teapot.obj #
 # cam_matrix_path camera_matrix.olm #
 
 # render prefs    #
