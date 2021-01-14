@@ -5,6 +5,7 @@
 
 
 #include "framebuffer.h"
+#include "sceneloader.h"
 
 
 
@@ -18,7 +19,9 @@ int MAX_TOKENS_PER_LINE = 100;
 
 void sceneloader::load_file( char* filepath )
 {
-    cout << "sceneloader loading file "<< filepath << "\n";
+
+    /*
+        cout << "sceneloader loading file "<< filepath << "\n";
 
     ifstream fin;
     fin.open(filepath); // open a file
@@ -154,6 +157,7 @@ void sceneloader::load_file( char* filepath )
     // object_path;
     // cam_matrix_path;
     // proj_matrix_path;
+    */
 
 }
 
@@ -162,9 +166,9 @@ void sceneloader::load_file( char* filepath )
 void sceneloader::show()
 {
 
-   cout << " 3D object       " << object_path      << "\n";
-   cout << " camera matrix   " << cam_matrix_path  << "\n";
-   cout << " proj matrix     " << proj_matrix_path << "\n";      
+   // cout << " 3D object       " << object_path      << "\n";
+   // cout << " camera matrix   " << cam_matrix_path  << "\n";
+   // cout << " proj matrix     " << proj_matrix_path << "\n";      
 
 }
 

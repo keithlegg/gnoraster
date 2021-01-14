@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sceneloader.h"
-#include "framebuffer.h"
+
+
 #include "point_op.h"
 #include "BMP.h"
+
+#include "framebuffer.h"
+#include "sceneloader.h"
 
 // #include "scan_core.h"
 // #include "image_util.h"
@@ -67,14 +70,40 @@ void test_image_draw( int width, int height, char *outfile)
    new_outfile.write( outfile) ;
 } 
 
+
+
 /***********************************/
 
 
-int main()
+void test_sceneloader()
+{
+
+
+    //RS.load_file( filenam );
+    //RS.show();
+
+    //test_image_draw( atoi(argv[1]), atoi(argv[2]), argv[3], argv[4]);
+
+}
+
+
+/***********************************/
+
+
+int main(int argc, char *argv[])
 {
 
 	//test_load_save_bmp
-    test_image_draw(512, 512, "abc.bmp");
+    //test_image_draw(512, 512, "abc.bmp");
     // std::cout << "Hello World!";
+
+    sceneloader RS;
+    char* filename = "eee";
+    
+    RS.load_file("Eee");
+
+
+
     return 0;
 }
+
