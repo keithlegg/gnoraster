@@ -4,11 +4,12 @@
 #include <cstring> //memset 
 
 #include <stdio.h>
-#include <cstdlib>
+#include <cstdint>
+
 #include <cmath>
 
 #include "framebuffer.h"
-#include "BMP.h"
+#include "bmp.h"
 
 
 using namespace std; 
@@ -69,12 +70,21 @@ using namespace std;
 */
 
 
+
 void test_BMP(void)
 {
-    BMP bmpxx(512, 512);
-    bmpxx.fill_region(0, 0, 50, 50, 0, 0, 255, 255);
-    bmpxx.write("foobartest.bmp");
+
+    BMP bmpxx(300 );
+    BMP * p_bmpxx = &bmpxx;
+
+    p_bmpxx->show();
+
+    //BMP bmpxx( uint32_t x = 100, uint32_t y = 100 );
+    //bmpxx.fill_region(0, 0, 50, 50, 0, 0, 255, 255);
+
+    //bmpxx.write("foobartest.bmp");
 }
+
 
 //     void set_pixel(uint32_t x0, uint32_t y0, uint8_t B, uint8_t G, uint8_t R, uint8_t A) {
 //         if (x0 > (uint32_t)bmp_info_header.width || y0 > (uint32_t)bmp_info_header.height) {

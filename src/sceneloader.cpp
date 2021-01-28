@@ -20,6 +20,14 @@ int MAX_TOKENS_PER_LINE = 100;
     Obviously I need to learn a lot more about strtok(), and strings in C 
 */
 
+
+void sceneloader::loadbmp(char* filepath){
+    //framebuffer FB(512,512);
+
+}
+
+/*************************************/
+
 void sceneloader::write_file( char* filepath )
 {
 

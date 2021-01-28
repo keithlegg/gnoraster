@@ -16,6 +16,8 @@ class sceneloader
         ~sceneloader(){};
 
 
+        //framebuffer FB;
+
         // framebuffer::RGBType bg_color; 
         // framebuffer::RGBType vtx_color; 
         // framebuffer::RGBType line_color; 
@@ -29,6 +31,8 @@ class sceneloader
         // file operations 
         void read_file( char* filepath );
         void write_file( char* filepath );
+
+        void loadbmp(char* filepath);
 
         /**************************/
         // convert_colors

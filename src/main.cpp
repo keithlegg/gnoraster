@@ -5,7 +5,7 @@
 
 
 #include "point_op.h"
-#include "BMP.h"
+#include "bmp.h"
 
 #include "framebuffer.h"
 #include "sceneloader.h"
@@ -28,7 +28,7 @@ void test_load_save_bmp(char *infile, char *outfile)
 /***********************************/
 /*
    self contained example of creating a BMP file 
-   detached from the renderer, just to show how to driectly 
+   detached from the renderer, just to show how to directly 
    create a framebuffer and dump it to disk.
 
    The colors are a total mess. 
@@ -53,9 +53,19 @@ void test_image_draw( int width, int height, char *outfile)
         {  
             pix_iterator = y * width + x;     
 
-            test_draw.rgbdata[pix_iterator].r = 254;  //= 0x254;      
-            test_draw.rgbdata[pix_iterator].g = 0;  //= 0x0
-            test_draw.rgbdata[pix_iterator].b = 0;  //= 0x0
+            if(x%5==0 && y%5==0){ 
+                test_draw.rgbdata[pix_iterator].r = 200;  
+                test_draw.rgbdata[pix_iterator].g = 0;    
+                test_draw.rgbdata[pix_iterator].b = 200;    
+            } else{
+
+                test_draw.rgbdata[pix_iterator].r = 0;    
+                test_draw.rgbdata[pix_iterator].g = 100;  
+                test_draw.rgbdata[pix_iterator].b = 100;    
+
+            }   
+
+
 
         }
    }
@@ -65,9 +75,9 @@ void test_image_draw( int width, int height, char *outfile)
    drawcolor.g = 0x0;
    drawcolor.b = 0x0;
 
-   BMP new_outfile( width, height);
-   new_outfile.dump_rgba_data(0, 0, width, height, test_draw.rgbdata);
-   new_outfile.write( outfile) ;
+   // BMP new_outfile( width, height);
+   // new_outfile.dump_rgba_data(0, 0, width, height, test_draw.rgbdata);
+   // new_outfile.write( outfile) ;
 } 
 
 
@@ -95,12 +105,12 @@ void test_sceneloader(char* filename)
 int main(int argc, char *argv[])
 {
 
-	//test_load_save_bmp
-    //test_image_draw(512, 512, "abc.bmp");
-    // std::cout << "Hello World!";
+	  //test_load_save_bmp
+    // test_image_draw(512, 512, "abc.bmp");
+    
+    test_BMP();
+
     test_sceneloader( argv[1] ); //atoi(argv[1])
-
-
 
 
     return 0;

@@ -1,9 +1,7 @@
 ## test scene  ##
 
-loadbmp 3d_obj/teapot.obj #
-# cam_matrix_path camera_matrix.olm #
+loadbmp bitmaps/grid.bmp #
 
-# render prefs    #
-rendermode litshaded #
+
 
 
